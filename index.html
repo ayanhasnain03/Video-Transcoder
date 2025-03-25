@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plyr with HLS.js – Smooth Quality Switching</title>
+
+    <!-- Plyr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0d0d0d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .container {
+        text-align: center;
+        color: white;
+        width: 100%;
+        max-width: 960px;
+        padding: 20px;
+      }
+
+      video {
+        width: 100%;
+        max-width: 900px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+      }
+
+      .plyr {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <video id="hls-video" controls crossorigin playsinline></video>
+    </div>
+
+    <!-- Plyr and HLS.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const video = document.getElementById("hls-video");
+        const source = "./src/videos/transcoded/sample/master.m3u8";
+
+        if (Hls.isSupported()) {
+          const hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 90,
+            maxBufferLength: 30, // Ensure smooth playback
+            maxMaxBufferLength: 60, // Prevent long buffering delays
+            capLevelToPlayerSize: true, // Avoid unnecessary high quality
+            autoLevelCapping: -1, // Allow auto bitrate
+            startLevel: -1, // Auto-select best quality
+          });
+
+          hls.loadSource(source);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            const availableQualities = hls.levels.map((l) => l.height);
+            const defaultOptions = {
+              quality: {
+                default: availableQualities[0],
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                  console.log("Switching to quality:", newQuality);
+                  hls.nextLevel = availableQualities.indexOf(newQuality);
+                },
+              },
+            };
+
+            const player = new Plyr(video, defaultOptions);
+          });
+
+          window.hls = hls;
+        } else {
+          video.src = source;
+          new Plyr(video);
+        }
+      });
+    </script>
+  </body>
+</html>
