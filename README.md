@@ -2,7 +2,6 @@
 
 A simple node-express API that lets you transcode videos and generate corresponding`.hls` and `.ts` files.
 
-### [Medium Article](https://medium.com/javascript-in-plain-english/building-a-simple-video-transcoding-service-with-node-and-ffmpeg-271b2e73d5e0)
 
 ### Future updates will allow users to
 
@@ -38,13 +37,4 @@ A simple node-express API that lets you transcode videos and generate correspond
 - stop playback and no more chunks will be fetched.
 - skip to a new video position and a new chunk will be fetched.
 - jump back to a point in video which has already played and you'll see that the chunk was loaded immediately from `disk cache`.
-
-## ❗️Important
-
-> Please read CHANGELOG.md and check the version number in package.json to make sure you're following the right steps to get stuff done.
-
-> Transcoder runs on port 4000 by default. If you wish to change this, you can either add a .env file at the root level, or directly change the port number in './src/index.ts
-
-> time taken for transcoding to complete will depend upon the file size of the video being used.
-
-> Video in the `./src/videos/raw` folder has been downloaded from YouTube for the purpose of this project and not for re-distribution or anything.
+thing.
